@@ -1,0 +1,7 @@
+<Agreement AgreementId="slaautoelastic">
+	<Name>AutoElasticSLA</Name>
+	<Terms>
+		<MaximalHosts>3</MaximalHosts>
+		<MinimalHosts>1</MinimalHosts>
+	</Terms>
+</Agreement>

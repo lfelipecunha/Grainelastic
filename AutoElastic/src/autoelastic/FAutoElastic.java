@@ -287,7 +287,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbBuscarSLA.setForeground(new java.awt.Color(255, 255, 255));
         jbBuscarSLA.setText("SLA");
         jbBuscarSLA.setContentAreaFilled(false);
-        jbBuscarSLA.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbBuscarSLA.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbBuscarSLA.setFocusable(false);
         jbBuscarSLA.setOpaque(true);
         jbBuscarSLA.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -606,16 +606,8 @@ public class FAutoElastic extends javax.swing.JFrame {
         jtHosts.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jtHosts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"10.210.1.88"},
-                {"10.210.2.164"},
-                {"10.210.5.57"},
-                {"10.210.5.120"},
-                {"10.210.6.232"},
-                {"10.210.7.129"},
-                {"10.210.7.130"},
-                {"10.210.7.131"},
-                {"10.210.7.230"},
-                {"10.210.7.231"}
+                {"one-sandbox"},
+                {"192.168.15.14"}
             },
             new String [] {
                 "Hosts"
@@ -636,7 +628,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbAddHost.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jbAddHost.setText("+");
         jbAddHost.setContentAreaFilled(false);
-        jbAddHost.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbAddHost.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbAddHost.setFocusable(false);
         jbAddHost.setOpaque(true);
         jbAddHost.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -663,7 +655,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbDelHost.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jbDelHost.setText("-");
         jbDelHost.setContentAreaFilled(false);
-        jbDelHost.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbDelHost.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbDelHost.setFocusable(false);
         jbDelHost.setOpaque(true);
         jbDelHost.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -768,7 +760,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbLimpar.setForeground(new java.awt.Color(255, 255, 255));
         jbLimpar.setText("Reset");
         jbLimpar.setContentAreaFilled(false);
-        jbLimpar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbLimpar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbLimpar.setFocusable(false);
         jbLimpar.setOpaque(true);
         jbLimpar.setPreferredSize(new java.awt.Dimension(81, 23));
@@ -798,7 +790,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbExecutar.setText("Execute");
         jbExecutar.setBorder(null);
         jbExecutar.setContentAreaFilled(false);
-        jbExecutar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbExecutar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbExecutar.setFocusable(false);
         jbExecutar.setOpaque(true);
         jbExecutar.setPreferredSize(new java.awt.Dimension(81, 23));
@@ -828,7 +820,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbParar.setText("Stop");
         jbParar.setBorder(null);
         jbParar.setContentAreaFilled(false);
-        jbParar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbParar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbParar.setEnabled(false);
         jbParar.setFocusable(false);
         jbParar.setOpaque(true);
@@ -886,7 +878,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbMinimize.setForeground(new java.awt.Color(102, 102, 102));
         jbMinimize.setText("_");
         jbMinimize.setContentAreaFilled(false);
-        jbMinimize.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbMinimize.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbMinimize.setFocusable(false);
         jbMinimize.setOpaque(true);
         jbMinimize.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -914,7 +906,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbSaleLog.setForeground(new java.awt.Color(255, 255, 255));
         jbSaleLog.setText("Save LOG");
         jbSaleLog.setContentAreaFilled(false);
-        jbSaleLog.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbSaleLog.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbSaleLog.setFocusable(false);
         jbSaleLog.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jbSaleLog.setOpaque(true);
@@ -944,7 +936,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbAbout.setText("About");
         jbAbout.setToolTipText("");
         jbAbout.setContentAreaFilled(false);
-        jbAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbAbout.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbAbout.setFocusable(false);
         jbAbout.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jbAbout.setOpaque(true);
@@ -977,7 +969,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbExit.setForeground(new java.awt.Color(102, 102, 102));
         jbExit.setText("X");
         jbExit.setContentAreaFilled(false);
-        jbExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jbExit.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jbExit.setFocusable(false);
         jbExit.setOpaque(true);
         jbExit.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1585,11 +1577,11 @@ public class FAutoElastic extends javax.swing.JFrame {
 
     private void variaveis_padroes() {
         //definir os parametros para o padrao
-        this.jtfFrontend.setText("10.210.7.116");
+        this.jtfFrontend.setText("192.168.15.130");
         this.jtfUsuario.setText("oneadmin");
-        this.jtfSenha.setText("nebula");
-        this.jtfSla.setText("C:\\Users\\Vinicius Facco\\Dropbox\\UNISINOS\\PIPCA\\Projetos\\AutoElastic\\autoelasticsla.xml");
-        this.jtfLogPath.setText("C:\\Temp\\autoelastic\\");
+        this.jtfSenha.setText("opennebula");
+        this.jtfSla.setText("/home/luiz/Projects/Unisinos/TCC/autoelastic/sla.xml");
+        this.jtfLogPath.setText("/tmp/autoelastic");
         this.jtfExecutionLogName.setText("");
         this.jtfMonitoringInterval.setText("15");
         this.jtfMonitoringWindow.setText("6");

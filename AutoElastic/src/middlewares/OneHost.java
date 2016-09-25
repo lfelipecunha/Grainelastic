@@ -190,7 +190,7 @@ public class OneHost {
         Element UCPU = (Element)USEDCPU.item(0);
         NodeList textUCPU = UCPU.getChildNodes();
         this.USED_CPU = Integer.parseInt(((Node)textUCPU.item(0)).getNodeValue().trim());
-        //System.out.println("USED_CPU: " + this.USED_CPU);
+        System.out.println("USED_CPU: " + ((Node)textUCPU.item(0)).getNodeValue().trim());
         
         //buscando elemento MAX_MEM no xml para tradução
         NodeList MAXMEM = conjunto_parametros.getElementsByTagName("MAX_MEM");
