@@ -44,6 +44,7 @@ public class GenericEvaluator implements Evaluator{
     public boolean evaluate(float upper_threshold, float lower_threshold){
         //----------------------------------------------------------------------
         //para realizar a avaliação primeiramente comparo a cpu com os thresholds
+        gera_log(objname, "LOAD: " + Float.toString(decision_load) + " | Upper: " + Float.toString(upper_threshold) + " | counter: " + counter + "VIEW_SIZE: " + VIEW_SIZE);
         if (decision_load > upper_threshold){        //verifico se violamos o limite superior
             if (counter >= 0){          //se sim, então verifico se o contador de violações está zerado ou já possui alguma contagem consecutiva de violações superiores
                 counter++;              //se sim então incremento o contador
@@ -128,5 +129,4 @@ public class GenericEvaluator implements Evaluator{
         low_alert = false;
         decision_load = 0;
     }
-    
 }

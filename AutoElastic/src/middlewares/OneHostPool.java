@@ -56,6 +56,7 @@ public class OneHostPool {
             //hosts[i] = new OneHost(ips[i], "im_kvm", "vmm_kvm", "dummy", "tm_ssh");
             //hosts_inativos.add(new OneHost(ips[i], "kvm", "kvm", "dummy", 100, log));
             //hosts_inativos.add(new OneHost(ips[i], "im_kvm", "vmm_kvm", "dummy", "tm_ssh")); comentado por atualização de versão
+            gera_log(objname, "Nome: " + ips[i]);
             hosts_inativos.add(new OneHost(ips[i], IM, VMM, VNM, CLUSTER_ID, log));
         }
         this.hostpool = new HostPool(oc);

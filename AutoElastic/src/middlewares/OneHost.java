@@ -72,8 +72,10 @@ public class OneHost {
     
     public boolean create(Client oc) throws Exception {
         //OneResponse rc = Host.allocate(oc, name, image_manager, virtual_machine_manager, virtual_network_manager, transfer_manager); comentado por atualização de versão
-        OneResponse rc = Host.allocate(oc, name, image_manager, virtual_machine_manager, virtual_network_manager);
+        // OneResponse rc = Host.allocate(oc, name, image_manager, virtual_machine_manager, virtual_network_manager);
+        OneResponse rc = Host.allocate(oc, name, image_manager, virtual_machine_manager);
         if( rc.isError() ){
+            gera_log(objname, "NAME: " + name);
             gera_log(objname,"Falha ao criar Host!" + "\n" + rc.getErrorMessage());
             return false;
         }
@@ -83,6 +85,7 @@ public class OneHost {
             DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");   //code to get
             Date date = new Date();                                     //the allocate time
             greenHPC_log(this.name + ";" + dateFormat.format(date) + ";" + date.getTime() + ";ALOCA");
+            gera_log(objname, "Criando host..." + this.name + ";" + dateFormat.format(date) + ";" + date.getTime() + ";ALOCA");
         }
         this.status = true;
         return true;

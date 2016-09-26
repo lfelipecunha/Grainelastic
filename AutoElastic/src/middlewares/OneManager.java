@@ -78,7 +78,9 @@ public class OneManager {
     public boolean serverConnect(){
         try {
             //> realiza conexão com o front-end
+           
             oneClient = new Client(user + ":" + password, "http://" + server_address + ":" + server_port + "/RPC2");
+            
             if (oneClient.get_version().getMessage() != null){ //try to get the version. if null is because we do not have connection with the server
                 gera_log(objname,"Versão do OpenNebula: " + oneClient.get_version().getMessage());
                 //>criação dos hosts que podem ser utilizados
@@ -158,20 +160,27 @@ public class OneManager {
      * @throws InterruptedException
      * @throws Exception
      */
-    public boolean increaseResources() throws InterruptedException, Exception{
+    public boolean increaseResources(int quantity) throws InterruptedException, Exception{
         //int hostid = ohpool.allocatesHostNow(oneClient); //allocates the host and it will be active immediatly
-        int hostid = ohpool.allocatesHost(oneClient);      //allocates the host and it will be active after resorces be online
-        if (hostid > 0){
-            for (int i = 0; i < vms_for_host; i++) {
-                last_vms[i] = new OneVM(vmtemplateid);
-                increaseVM(last_vms[i], hostid); //aloca vm nesse host
-                //gera_log(objname,"Main: Nova VM alocada: " + last_vms[i].get_id());
-                ohpool.get_onehost(hostid).add_vm(last_vms[i]);
-                System.out.println("Alocando vm...");
-                //Thread.sleep(10000); //why?
+        while (quantity > 0) { 
+            gera_log(objname, "Increase Resources...");
+            int hostid = ohpool.allocatesHost(oneClient);      //allocates the host and it will be active after resorces be online
+            gera_log(objname, "Host: " + hostid);
+            if (hostid > 0){
+                for (int i = 0; i < vms_for_host; i++) {
+                    last_vms[i] = new OneVM(vmtemplateid);
+                    increaseVM(last_vms[i], hostid); //aloca vm nesse host
+                    gera_log(objname,"Main: Nova VM alocada: " + last_vms[i].get_id());
+                    ohpool.get_onehost(hostid).add_vm(last_vms[i]);
+                    System.out.println("Alocando vm...");
+                    //Thread.sleep(10000); //why?
+                    quantity--;
+                }
+                waiting_vms = true;
+                return true;
+            } else {
+                break;
             }
-            waiting_vms = true;
-            return true;
         }
         return false;
     }

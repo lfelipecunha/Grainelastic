@@ -606,8 +606,8 @@ public class FAutoElastic extends javax.swing.JFrame {
         jtHosts.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jtHosts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"one-sandbox"},
-                {"192.168.15.14"}
+                {"192.168.15.239"},
+                {"192.168.15.24"}
             },
             new String [] {
                 "Hosts"
@@ -795,17 +795,17 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbExecutar.setOpaque(true);
         jbExecutar.setPreferredSize(new java.awt.Dimension(81, 23));
         jbExecutar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jbExecutarMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jbExecutarMouseExited(evt);
-            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jbExecutarMousePressed(evt);
             }
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 jbExecutarMouseReleased(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jbExecutarMouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jbExecutarMouseEntered(evt);
             }
         });
         jbExecutar.addActionListener(new java.awt.event.ActionListener() {
@@ -826,17 +826,17 @@ public class FAutoElastic extends javax.swing.JFrame {
         jbParar.setOpaque(true);
         jbParar.setPreferredSize(new java.awt.Dimension(81, 23));
         jbParar.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jbPararMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                jbPararMouseExited(evt);
-            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jbPararMousePressed(evt);
             }
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 jbPararMouseReleased(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jbPararMouseExited(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jbPararMouseEntered(evt);
             }
         });
         jbParar.addActionListener(new java.awt.event.ActionListener() {
@@ -1577,10 +1577,10 @@ public class FAutoElastic extends javax.swing.JFrame {
 
     private void variaveis_padroes() {
         //definir os parametros para o padrao
-        this.jtfFrontend.setText("192.168.15.130");
+        this.jtfFrontend.setText("192.168.15.21");
         this.jtfUsuario.setText("oneadmin");
         this.jtfSenha.setText("opennebula");
-        this.jtfSla.setText("/home/luiz/Projects/Unisinos/TCC/autoelastic/sla.xml");
+        this.jtfSla.setText("/home/luiz/autoelastic/sla.xml");
         this.jtfLogPath.setText("/tmp/autoelastic");
         this.jtfExecutionLogName.setText("");
         this.jtfMonitoringInterval.setText("15");

@@ -12,6 +12,7 @@ import javax.swing.JTextArea;
 import middlewares.OneManager;
 import slas.WSAgreementSLA;
 import evaluators.*;
+import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import thresholds.*;
@@ -56,6 +57,8 @@ public class AutoElastic implements Runnable {
     private WSAgreementSLA sla;         //sla que será utilizado pelo gerenciador para monitoramento
     private Evaluator evaluator;        //avaliador para saber se operações devem ser tomadas ou não
     private Thresholds thresholds;      //object to manage the thresholds
+    private float loads[];
+    private int cont;
     
     private static final String objname = "autoelastic.AutoElastic"; //name of the object to use in log information
     private static String frontend;
@@ -82,9 +85,11 @@ public class AutoElastic implements Runnable {
     private static String virtual_network_manager;
     private static int cluster_id;
     
+    
     public AutoElastic(JPanel pgraphic1, JPanel pgraphic2){
         graphic1 = new Graphic(pgraphic1, "CPU Usage (Total)");
         graphic2 = new Graphic(pgraphic2, "CPU Usage (%)");
+        loads = new float[5];
     }
 
     /**
@@ -216,7 +221,7 @@ public class AutoElastic implements Runnable {
     private void monitoring() throws ParserConfigurationException, SAXException, IOException, InterruptedException, Exception {
         boolean resourcesPending = false;           //flag to inform if the system are waiting for new resources
         int time;                                   //elapsed time
-        int cont = 0;                               //counter of verifications
+        cont = 0;                               //counter of verifications
         long timeLoop;                              //time to execute the entire loop        
         long time0 = System.currentTimeMillis();    //initial time
         byte recalculate_thresholds = 0;            //flag to sinalize that the thresholds must be recalculated
@@ -233,6 +238,8 @@ public class AutoElastic implements Runnable {
             /*GRA*/graphic2.update(cont, cloud_manager.getCPULoad(), 1, thresholds.getUpperThreshold(), thresholds.getLowerThreshold());
             /*LOG*/gera_log(objname,"Main|monitora: Soma da carga de cpu de todos os hosts: " + cloud_manager.getUsedCPU() + " / Threshold maximo estabelecido: " + cloud_manager.getAllocatedCPU() * thresholds.getUpperThreshold() + " / Threshold minimo estabelecido: " + cloud_manager.getAllocatedCPU() * thresholds.getLowerThreshold());
             /*LOG*/gera_log(objname,"Main: Realiza verificação de alguma violação dos thresholds...");
+            gera_log(objname, "CPULoad: " + cloud_manager.getCPULoad());
+            saveLoad(cloud_manager.getCPULoad());
             evaluator.computeLoad(cloud_manager.getCPULoad());            
             if (recalculate_thresholds > 0){//if this flag is greater than 0, then we must recalculate the thresholds (Live Thresholding)
                 load_after = evaluator.getDecisionLoad();//get the new load with the new resources
@@ -245,7 +252,9 @@ public class AutoElastic implements Runnable {
                 }
                 recalculate_thresholds = 0;
             }            
+            gera_log(objname, "Pending: " + Boolean.toString(resourcesPending));
             if ((evaluator.evaluate(thresholds.getUpperThreshold(), thresholds.getLowerThreshold())) && (!resourcesPending)){
+                gera_log(objname, "Estorou: true");
                 //analyze the cloud situation and if we have some violation we need deal with this and if we are not waiting for new resource allocation we can evaluate the cloud
                 /*LOG*/export_log(cont, time, System.currentTimeMillis(), cloud_manager.getTotalActiveHosts(), cloud_manager.getAllocatedCPU(), cloud_manager.getUsedCPU(), cloud_manager.getAllocatedMEM(), cloud_manager.getUsedMEM(), cloud_manager.getAllocatedCPU() * thresholds.getUpperThreshold(), cloud_manager.getAllocatedCPU() * thresholds.getLowerThreshold(), cloud_manager.getCPULoad(), evaluator.getDecisionLoad(), thresholds.getLowerThreshold(), thresholds.getUpperThreshold(), cloud_manager.getLastMonitorTimes());
                 if (evaluator.isHighAction()){//if we have a violation on the high threshold
@@ -254,7 +263,7 @@ public class AutoElastic implements Runnable {
                     if(sla.canIncrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can increase resources
                         /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser alocado...");
                         /*LOG*/gera_log(objname,"Main: Alocando recursos...");
-                        cloud_manager.increaseResources(); //increase one host and the number of vms informed in the parameters
+                        cloud_manager.increaseResources(getNumberOfVms()); //increase one host and the number of vms informed in the parameters
                         resourcesPending = true;
                     } else {
                         /*LOG*/gera_log(objname,"Main: SLA no limite...nada pode ser feito...");
@@ -275,6 +284,7 @@ public class AutoElastic implements Runnable {
                         /*LOG*/gera_log(objname,"Main: Evaluator problem. We have violation but we do not know which.");
                 }
             } else {
+                gera_log(objname, "Estorou: false");
                 /*LOG*/gera_log(objname,"Main: Aguardando inicialização de recursos ou aguardando inicialização de recursos.");
                 /*LOG*/export_log(cont, time, System.currentTimeMillis(), cloud_manager.getTotalActiveHosts(), cloud_manager.getAllocatedCPU(), cloud_manager.getUsedCPU(), cloud_manager.getAllocatedMEM(), cloud_manager.getUsedMEM(), cloud_manager.getAllocatedCPU() * thresholds.getUpperThreshold(), cloud_manager.getAllocatedCPU() * thresholds.getLowerThreshold(), cloud_manager.getCPULoad(), evaluator.getDecisionLoad(), thresholds.getLowerThreshold(), thresholds.getUpperThreshold(), cloud_manager.getLastMonitorTimes());
             }
@@ -571,7 +581,7 @@ public class AutoElastic implements Runnable {
                         ///*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser alocado...");
                         ///*LOG*/gera_log(objname,"Main: Alocando recursos...");
                         times = times + ";" + System.currentTimeMillis(); //T7-AntesDeAlocar
-                        cloud_manager.increaseResources(); //increase one host and the number of vms informed in the parameters
+                        cloud_manager.increaseResources(getNumberOfVms()); //increase one host and the number of vms informed in the parameters
                         resourcesPending = true;
                         times = times + ";" + System.currentTimeMillis() + ";;"; //T8-AposAlocar + T9 e T10 vazios
                     } else {
@@ -619,4 +629,74 @@ public class AutoElastic implements Runnable {
         ssh.deleteFile(message, remotedir);
         return times;
     }
+    
+    
+    // new methods
+    
+    private int getNumberOfVms()
+    {
+        if (cont > loads.length) {
+            float futureLoad = getFutureLoad();
+            float vmCapacity = getVMCapacity();
+            float currentLoad = loads[loads.length-1];
+            float expectedLoad = getExpectedLoad();
+            
+            gera_log(objname, "Future Load: " + futureLoad);
+            gera_log(objname, "VM Capacity: " + vmCapacity);
+            gera_log(objname, "Current Load: " + currentLoad);
+            gera_log(objname, "Expected Load: " + expectedLoad);
+            int totalVMs = Math.round(futureLoad / vmCapacity * currentLoad / expectedLoad);
+            gera_log(objname, "Total of VMs: " + totalVMs);
+            
+            System.exit(-1);
+            
+            return 1;
+            
+            
+        }
+        return 1;
+    }
+    
+    private float getVMCapacity()
+    {
+        float currentLoad = loads[loads.length-1];
+        return currentLoad / cloud_manager.getTotalActiveHosts();
+    }
+    
+    private float getFutureLoad()
+    {
+        int curMultiplier = 1;
+        int lastMultiplier = 0;
+        int sum = 0;
+        float result = 0;
+        for(int i=0; i<loads.length; i++) {
+            int nextMultiplier = curMultiplier + lastMultiplier;
+            sum += curMultiplier;
+            gera_log(objname, "Multiplicador: " + curMultiplier + " Valor na posição " + i + " : " + loads[i]);
+            result += loads[i] * curMultiplier;
+            
+            lastMultiplier = curMultiplier;
+            curMultiplier = nextMultiplier;
+        }
+        
+        gera_log(objname, "Soma: " + sum);
+        
+        return result/sum;
+    }
+    
+    private float getExpectedLoad()
+    {
+        return (thresholds.getUpperThreshold() + thresholds.getLowerThreshold()) / 2;
+    }
+    
+    private void saveLoad(float load)
+    {
+        int pos = cont%loads.length;
+        for (int i=0; i<pos; i++) {
+            loads[i] = loads[i+1];
+        }
+        
+        loads[pos] = load;
+    }
+            
 }

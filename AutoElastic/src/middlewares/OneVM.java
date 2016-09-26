@@ -53,17 +53,20 @@ public class OneVM {
             this.vm = new VirtualMachine(this.id, oc);
             vm.deploy(hostid);
         }
+        
+        gera_log(objname, "Error: " + rc.getErrorMessage());
         return this.id;
     }
     
     public boolean delete(){
         //this.vm.finalizeVM();
         //this.vm.cancel();
-        OneResponse rc = this.vm.delete();
+        OneResponse rc = this.vm.poweroff();
          if (rc.isError()){
             System.out.println("Falha ao deletar VM ID " + this.id + "\n" + rc.getErrorMessage());
             return false;
         }
+        this.vm.undeploy(false);
         return true;
     }
     
