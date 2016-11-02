@@ -606,8 +606,9 @@ public class FAutoElastic extends javax.swing.JFrame {
         jtHosts.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jtHosts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"192.168.15.239"},
-                {"192.168.15.24"}
+                {"192.168.15.100"},
+                {"192.168.15.101"},
+                {"192.168.15.102"}
             },
             new String [] {
                 "Hosts"
@@ -1577,11 +1578,11 @@ public class FAutoElastic extends javax.swing.JFrame {
 
     private void variaveis_padroes() {
         //definir os parametros para o padrao
-        this.jtfFrontend.setText("192.168.15.21");
+        this.jtfFrontend.setText("192.168.15.99");
         this.jtfUsuario.setText("oneadmin");
         this.jtfSenha.setText("opennebula");
         this.jtfSla.setText("/home/luiz/autoelastic/sla.xml");
-        this.jtfLogPath.setText("/tmp/autoelastic");
+        this.jtfLogPath.setText("/tmp/autoelastic/");
         this.jtfExecutionLogName.setText("");
         this.jtfMonitoringInterval.setText("15");
         this.jtfMonitoringWindow.setText("6");

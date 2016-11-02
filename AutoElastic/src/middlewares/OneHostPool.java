@@ -116,13 +116,19 @@ public class OneHostPool {
     
     //when this method is used, a new host is allocated but it is still not considered part of set of active hosts
     public int allocatesHost(Client oc) throws Exception{
+        return allocatesHost(oc, 0);
+    }
+    
+    public int allocatesHost(Client oc, int position) throws Exception
+    {
         if (!hosts_inativos.isEmpty()){
-            OneHost host;
-            host = hosts_inativos.get(0);
-            host.create(oc);
-            //host = hosts_inativos.remove(0);
-            //hosts_ativos.add(host);
-            return host.get_id();
+            if (hosts_inativos.size() <= position+1) {
+                OneHost host;
+                host = hosts_inativos.get(position);
+                host.create(oc);
+
+                return host.get_id();
+            }
         }
         return 0;
     }

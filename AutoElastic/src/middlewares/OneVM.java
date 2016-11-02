@@ -32,6 +32,7 @@ public class OneVM {
     private VirtualMachine vm;
     private String ip = "";
     private int state;
+    private int lcm_state;
     private int templateid;
     private JTextArea log;
     
@@ -81,11 +82,17 @@ public class OneVM {
     public int get_state(){
         return this.state;
     }
+    
+    public int get_lcm_state()
+    {
+        return this.lcm_state;
+    }
   
     public void sync_vm() throws ParserConfigurationException, SAXException, IOException{
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         String info = this.get_info();
+        
         InputSource is = new InputSource(new ByteArrayInputStream(info.getBytes()));
         Document doc = docBuilder.parse(is);
         doc.getDocumentElement().normalize();
@@ -98,6 +105,10 @@ public class OneVM {
         el = (Element) nl.item(0);
         this.state = Integer.parseInt(el.getChildNodes().item(0).getNodeValue().trim());
         //System.out.println("Status VM ID " + this.id + ": " + this.state);log.append("Status VM ID " + this.id + ": " + this.state + "\n");
+        
+        nl = doc.getElementsByTagName("LCM_STATE");
+        el = (Element) nl.item(0);
+        this.lcm_state = Integer.parseInt(el.getChildNodes().item(0).getNodeValue().trim());
     }
     
     private String get_info() {

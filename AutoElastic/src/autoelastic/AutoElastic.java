@@ -12,6 +12,7 @@ import javax.swing.JTextArea;
 import middlewares.OneManager;
 import slas.WSAgreementSLA;
 import evaluators.*;
+import grainevaluators.GrainEvaluator;
 import java.util.ArrayList;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
@@ -60,7 +61,7 @@ public class AutoElastic implements Runnable {
     private float loads[];
     private int cont;
     
-    private static final String objname = "autoelastic.AutoElastic"; //name of the object to use in log information
+    private static final String objname = "autoelastic.GrainElastic"; //name of the object to use in log information
     private static String frontend;
     private static String usuario;
     private static String senha;
@@ -226,7 +227,10 @@ public class AutoElastic implements Runnable {
         long time0 = System.currentTimeMillis();    //initial time
         byte recalculate_thresholds = 0;            //flag to sinalize that the thresholds must be recalculated
         float load_before = 0, load_after;          //loads before and after delivery new resources (Used to Live Thresholding)
-        long timen = System.currentTimeMillis();    //current time         
+        long timen = System.currentTimeMillis();    //current time
+        
+        GrainEvaluator grainEvaluator = new GrainEvaluator(cloud_manager, thresholds);
+        
         while (monitoring){                 
             cont++;
             time = (int) ((timen - time0)/1000);
@@ -239,7 +243,7 @@ public class AutoElastic implements Runnable {
             /*LOG*/gera_log(objname,"Main|monitora: Soma da carga de cpu de todos os hosts: " + cloud_manager.getUsedCPU() + " / Threshold maximo estabelecido: " + cloud_manager.getAllocatedCPU() * thresholds.getUpperThreshold() + " / Threshold minimo estabelecido: " + cloud_manager.getAllocatedCPU() * thresholds.getLowerThreshold());
             /*LOG*/gera_log(objname,"Main: Realiza verificação de alguma violação dos thresholds...");
             gera_log(objname, "CPULoad: " + cloud_manager.getCPULoad());
-            saveLoad(cloud_manager.getCPULoad());
+            grainEvaluator.cycle();
             evaluator.computeLoad(cloud_manager.getCPULoad());            
             if (recalculate_thresholds > 0){//if this flag is greater than 0, then we must recalculate the thresholds (Live Thresholding)
                 load_after = evaluator.getDecisionLoad();//get the new load with the new resources
@@ -263,7 +267,7 @@ public class AutoElastic implements Runnable {
                     if(sla.canIncrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can increase resources
                         /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser alocado...");
                         /*LOG*/gera_log(objname,"Main: Alocando recursos...");
-                        cloud_manager.increaseResources(getNumberOfVms()); //increase one host and the number of vms informed in the parameters
+                        cloud_manager.increaseResources(grainEvaluator.getNumberOfVms()); //increase one host and the number of vms informed in the parameters
                         resourcesPending = true;
                     } else {
                         /*LOG*/gera_log(objname,"Main: SLA no limite...nada pode ser feito...");
@@ -274,7 +278,7 @@ public class AutoElastic implements Runnable {
                     if(sla.canDecrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can decrease resources
                         /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser liberado...");
                         /*LOG*/gera_log(objname,"Main: Liberando recursos...");
-                        cloud_manager.decreaseResources(); //decrease the last host added and the number its vms
+                        cloud_manager.decreaseResources(grainEvaluator.getNumberOfVms()); //decrease the last host added and the number its vms
                         recalculate_thresholds = 2;
                         load_before = evaluator.getDecisionLoad();
                     } else {
@@ -291,6 +295,7 @@ public class AutoElastic implements Runnable {
             if (resourcesPending){//if there are resources being initialized, so we make sure they are already online to be added and recalculate the thresholds (Live Thresholding)
                 load_before = evaluator.getDecisionLoad();
                 resourcesPending = cloud_manager.newResourcesPending(); //we must check before sleep if we have to deliver resources, thus these resources will only be considered at the next observation
+                gera_log(objname, "Pending2: " + Boolean.toString(resourcesPending));
                 if (!resourcesPending){//if we delivered the resources, in the next observations we must recalculate the thresholds
                     recalculate_thresholds = 1;
                 }
@@ -366,13 +371,17 @@ public class AutoElastic implements Runnable {
      */
     public void startLabMode(String srv, String usr, String pwd, String sla, String[] hosts, JTextArea lg) throws InterruptedException, IOException, ParserConfigurationException, SAXException, Exception{
         
+        System.out.println("Server: " + srv);
+        System.out.println("User: " + usr);
+        System.out.println("Pass: " + pwd);
+        
         SSHClient ssh = new SSHClient(srv, usr, pwd);
-        String ip_vm_master = "10.210.14.65";//VM que vai rodar mestre e slave inicial. Processos devem ser iniciados manualmente aqui.
+        String ip_vm_master = "10.1.1.100";//VM que vai rodar mestre e slave inicial. Processos devem ser iniciados manualmente aqui.
         String server_message_start = "appstarted";
         String server_message_stop = "appstoped";
         String autoelastic_message_start = "startapp";
         String master_command;
-        String localdir_temp_files = "C:\\temp\\autoelastic\\";
+        String localdir_temp_files = "/tmp/autoelastic/";
         String remotedir_message = "/var/lib/one/app/msg/";
         String remotedir_logs = "/one/app/logs/"; //diretorio que o mestre irá utilizar para salvar os logs
         
@@ -387,7 +396,7 @@ public class AutoElastic implements Runnable {
         AutoElastic.slapath = sla;
         AutoElastic.log = lg;
         AutoElastic.iphosts = hosts;        
-        AutoElastic.logspath = "C:\\Temp\\autoelastic\\";
+        AutoElastic.logspath = "/tmp/autoelastic/";
         AutoElastic.vmtemplateid = 3;
         AutoElastic.intervalo = 15 * 1000;
         AutoElastic.num_vms = 2;
@@ -482,7 +491,10 @@ public class AutoElastic implements Runnable {
                         escritor.write(master_command);
                         escritor.close();
 
-                        ssh.sendFile(arquivo.getAbsolutePath(), remotedir_message);
+                        if (!ssh.sendFile(arquivo.getAbsolutePath(), remotedir_message)) {
+                            System.out.println("Erro ao enviar o arquivo de inicialização." + arquivo.getAbsolutePath() + " | " + remotedir_message);
+                            System.exit(-1);
+                        }
                         System.out.println("Arquivo de inicialização enviado.");
 
                         //agora tenho que ver se posso iniciar o monitoramento
@@ -493,7 +505,7 @@ public class AutoElastic implements Runnable {
                         }
 
                         //aqui vamos colocar dentro do arquivo de alocações um marcador de que uma nova execução está iniciando. Esse marcador vai ser o nome da execução que é o nome do outro log que é gerado
-                        arquivo = new File("C:\\temp\\autoelastic\\autoelastic_resource_operation.csv");
+                        arquivo = new File("/tmp/autoelastic/autoelastic_resource_operation.csv");
                         escritor = new BufferedWriter(new FileWriter(arquivo, true));
                         escritor.append(System.currentTimeMillis() + ";INI " + AutoElastic.logtitle + "\n");
                         escritor.close();
@@ -503,7 +515,7 @@ public class AutoElastic implements Runnable {
                         System.out.println("###############Aplicação finalizada###############");
 
                         //aqui vamos escrever dentro do arquivo de alocações que a execução terminou
-                        arquivo = new File("C:\\temp\\autoelastic\\autoelastic_resource_operation.csv");
+                        arquivo = new File("/tmp/autoelastic/autoelastic_resource_operation.csv");
                         escritor = new BufferedWriter(new FileWriter(arquivo, true));
                         escritor.append(System.currentTimeMillis() + ";FIM " + AutoElastic.logtitle + "\n");
                         escritor.close();
@@ -512,7 +524,7 @@ public class AutoElastic implements Runnable {
                         ssh.deleteFile(server_message_start, remotedir_message);
 
                         //vamos salvar o log com os tempos do AutoElastic
-                        arquivo = new File("C:\\temp\\autoelastic\\Tempos-" + AutoElastic.logtitle + ".csv");
+                        arquivo = new File("/tmp/autoelastic/Tempos-" + AutoElastic.logtitle + ".csv");
                         escritor = new BufferedWriter(new FileWriter(arquivo, true));
                         escritor.append(times);
                         escritor.close();
@@ -534,11 +546,13 @@ public class AutoElastic implements Runnable {
         String times = "Contador;T1-InicioLoop;T2-AntesDeSincronizar;T3-AposSincronizar&AntesDeCalcularThresholds;T4-AposCalcularThresholds;T5-AntesDeAvaliarCarga;T6-AposAvaliarCarga;T7-AntesDeAlocar;T8-AposAlocar;T9-AntesDeDesalocar;T10-AposDesalocar;T11-AntesDeVerificarRecursosPendentes;T12-AposVerificarRecursosPendentes&FimLoop;Sincronização;CalculoThresholds;AvaliaçãoCarga;Alocação;Desalocação;VerificaRecursosPendentes;Loop";
         long time0 = System.currentTimeMillis(); //tempo inicial
         long timen = System.currentTimeMillis(); //primeiro tempo antes de iniciar o loop, apos isso esse tempo vai ser coletado no final após o sleep
+        GrainEvaluator grainEvaluator = new GrainEvaluator(cloud_manager, thresholds);
         while (!ssh.fileExists(message, remotedir)){//while do not exists a message to stop the monitoring we keep going            
             cont++;
             times = times + "\n" + cont + ";" + timen; //T1-InicioLoop            
             tempo = (int) ((timen - time0)/1000);
             System.out.println("Main: " + cont + " Time: " + tempo + "s");
+            grainEvaluator.cycle();
             ///*LOG*/gera_log(objname,"Main: " + cont + " Time: " + tempo + "s");
             ///*LOG*/gera_log(objname,"Main: Sincronizando hosts...");
             times = times + ";" + System.currentTimeMillis(); //T2-AntesDeSincronizar
@@ -581,7 +595,7 @@ public class AutoElastic implements Runnable {
                         ///*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser alocado...");
                         ///*LOG*/gera_log(objname,"Main: Alocando recursos...");
                         times = times + ";" + System.currentTimeMillis(); //T7-AntesDeAlocar
-                        cloud_manager.increaseResources(getNumberOfVms()); //increase one host and the number of vms informed in the parameters
+                        cloud_manager.increaseResources(grainEvaluator.getNumberOfVms()); //increase one host and the number of vms informed in the parameters
                         resourcesPending = true;
                         times = times + ";" + System.currentTimeMillis() + ";;"; //T8-AposAlocar + T9 e T10 vazios
                     } else {
@@ -595,7 +609,7 @@ public class AutoElastic implements Runnable {
                         ///*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser liberado...");
                         ///*LOG*/gera_log(objname,"Main: Liberando recursos...");
                         times = times + ";;;" + System.currentTimeMillis(); //T7 e T8 vazios + T9-AntesDeDesalocar
-                        cloud_manager.decreaseResources(); //decrease the last host added and the number its vms
+                        cloud_manager.decreaseResources(grainEvaluator.getNumberOfVms()); //decrease the last host added and the number its vms
                         recalculate_thresholds = 2;
                         load_before = evaluator.getDecisionLoad();
                         times = times + ";" + System.currentTimeMillis(); //T10-AposDesalocar
@@ -629,74 +643,4 @@ public class AutoElastic implements Runnable {
         ssh.deleteFile(message, remotedir);
         return times;
     }
-    
-    
-    // new methods
-    
-    private int getNumberOfVms()
-    {
-        if (cont > loads.length) {
-            float futureLoad = getFutureLoad();
-            float vmCapacity = getVMCapacity();
-            float currentLoad = loads[loads.length-1];
-            float expectedLoad = getExpectedLoad();
-            
-            gera_log(objname, "Future Load: " + futureLoad);
-            gera_log(objname, "VM Capacity: " + vmCapacity);
-            gera_log(objname, "Current Load: " + currentLoad);
-            gera_log(objname, "Expected Load: " + expectedLoad);
-            int totalVMs = Math.round(futureLoad / vmCapacity * currentLoad / expectedLoad);
-            gera_log(objname, "Total of VMs: " + totalVMs);
-            
-            System.exit(-1);
-            
-            return 1;
-            
-            
-        }
-        return 1;
-    }
-    
-    private float getVMCapacity()
-    {
-        float currentLoad = loads[loads.length-1];
-        return currentLoad / cloud_manager.getTotalActiveHosts();
-    }
-    
-    private float getFutureLoad()
-    {
-        int curMultiplier = 1;
-        int lastMultiplier = 0;
-        int sum = 0;
-        float result = 0;
-        for(int i=0; i<loads.length; i++) {
-            int nextMultiplier = curMultiplier + lastMultiplier;
-            sum += curMultiplier;
-            gera_log(objname, "Multiplicador: " + curMultiplier + " Valor na posição " + i + " : " + loads[i]);
-            result += loads[i] * curMultiplier;
-            
-            lastMultiplier = curMultiplier;
-            curMultiplier = nextMultiplier;
-        }
-        
-        gera_log(objname, "Soma: " + sum);
-        
-        return result/sum;
-    }
-    
-    private float getExpectedLoad()
-    {
-        return (thresholds.getUpperThreshold() + thresholds.getLowerThreshold()) / 2;
-    }
-    
-    private void saveLoad(float load)
-    {
-        int pos = cont%loads.length;
-        for (int i=0; i<pos; i++) {
-            loads[i] = loads[i+1];
-        }
-        
-        loads[pos] = load;
-    }
-            
 }

@@ -159,6 +159,7 @@ public class SSHClient {
             boolean ptimestamp = true;
             // exec 'scp -t destino' remotely
             String command = "scp " + (ptimestamp ? "-p" : "") + " -t " + remote_dir;
+            System.err.println(command);
             Channel channel = session.openChannel("exec");
             ((ChannelExec) channel).setCommand(command);
             try (
@@ -170,6 +171,7 @@ public class SSHClient {
                     channel.disconnect();
                     return false;
                 }
+                System.err.println("AKI");
                 File _lfile = new File(filepath);
                 if (ptimestamp) {
                     command = "T" + (_lfile.lastModified() / 1000) + " 0";
@@ -188,8 +190,8 @@ public class SSHClient {
                 long filesize = _lfile.length();
                 command = "C0644 " + filesize + " ";
                 //realiza corte para pegar apenas o nome do arquivo
-                if (filepath.lastIndexOf('\\') > 0) {
-                    command += filepath.substring(filepath.lastIndexOf('\\') + 1);
+                if (filepath.lastIndexOf('/') > 0) {
+                    command += filepath.substring(filepath.lastIndexOf('/') + 1);
                 } else {
                     command += filepath;
                 }
@@ -244,6 +246,7 @@ public class SSHClient {
         //          1 for error,
         //          2 for fatal error,
         //          -1
+        
         if (b == 0) {
             return b;
         }
@@ -259,11 +262,11 @@ public class SSHClient {
             } while (c != '\n');
             if (b == 1) { // error
                 //gera_log(objname,sb.toString());
-                System.out.println("Ack error: " + sb.toString());
+                System.out.println("Ack error: 1 " + sb.toString());
             }
             if (b == 2) { // fatal error
                 //gera_log(objname,sb.toString());
-                System.out.println("Ack error: " + sb.toString());
+                System.out.println("Ack error: 2 " + sb.toString());
             }
         }
         return b;
