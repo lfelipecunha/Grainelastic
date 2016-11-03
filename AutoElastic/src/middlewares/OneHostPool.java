@@ -139,6 +139,18 @@ public class OneHostPool {
         hosts_ativos.add(hosts_inativos.remove(0));
     }
     
+    public void enableHosts(int quantity)
+    {
+        for (int i=0; i<quantity; i++) {
+            enableLastHost();
+        }
+    }
+    
+    public OneHost getLastHost()
+    {
+        return hosts_ativos.get(hosts_ativos.size() - 1);
+    }
+    
     public boolean remove_host(Client oc) throws InterruptedException{        
         OneHost host;
         hosts_ativos.get(hosts_ativos.size() - 1).delete_vms();
@@ -158,6 +170,7 @@ public class OneHostPool {
         allocatedMEM = 0;
         usedMEM = 0;
         allMonitoringTimes = "";
+        gera_log(objname, "Hosts ativos: " + hosts_ativos.size());
         for (OneHost host_ativo : hosts_ativos) {
             //percorre todos os hosts ativos
             try {

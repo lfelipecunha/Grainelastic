@@ -606,9 +606,10 @@ public class FAutoElastic extends javax.swing.JFrame {
         jtHosts.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jtHosts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"192.168.15.100"},
-                {"192.168.15.101"},
-                {"192.168.15.102"}
+                {"191.4.237.220"},
+                {"191.4.233.173"},
+                {"191.4.238.196"},
+                {"191.4.239.117"}
             },
             new String [] {
                 "Hosts"
@@ -695,9 +696,9 @@ public class FAutoElastic extends javax.swing.JFrame {
             jpHostsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(jpHostsLayout.createSequentialGroup()
-                .addComponent(jbAddHost, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
+                .addComponent(jbAddHost, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jbDelHost, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
+                .addComponent(jbDelHost, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Hosts", jpHosts);
@@ -1578,9 +1579,9 @@ public class FAutoElastic extends javax.swing.JFrame {
 
     private void variaveis_padroes() {
         //definir os parametros para o padrao
-        this.jtfFrontend.setText("192.168.15.99");
+        this.jtfFrontend.setText("191.4.234.53");
         this.jtfUsuario.setText("oneadmin");
-        this.jtfSenha.setText("opennebula");
+        this.jtfSenha.setText("nebula");
         this.jtfSla.setText("/home/luiz/autoelastic/sla.xml");
         this.jtfLogPath.setText("/tmp/autoelastic/");
         this.jtfExecutionLogName.setText("");

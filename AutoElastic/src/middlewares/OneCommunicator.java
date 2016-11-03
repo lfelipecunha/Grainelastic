@@ -65,11 +65,11 @@ public class OneCommunicator {
     
     
     //método que verifica se é possível liberar recursos
-    public boolean notifyDecrease() throws InterruptedException, IOException {
+    public boolean notifyDecrease(String message) throws InterruptedException, IOException {
         File arquivo = new File(localdir_temp_files + warning_deacrease_file_name);
         try (
             BufferedWriter escritor = new BufferedWriter(new FileWriter(arquivo))) {
-            escritor.write("pouca_carga");
+            escritor.write(message);
         }
         //if (envia_arquivo(arquivo.getAbsolutePath())) {
         if (ssh.sendFile(arquivo.getAbsolutePath(), remotedir_file_target)){

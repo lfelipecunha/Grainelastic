@@ -386,7 +386,7 @@ public class AutoElastic implements Runnable {
         System.out.println("Pass: " + pwd);
         
         SSHClient ssh = new SSHClient(srv, usr, pwd);
-        String ip_vm_master = "10.1.1.100";//VM que vai rodar mestre e slave inicial. Processos devem ser iniciados manualmente aqui.
+        String ip_vm_master = "191.4.238.100";//VM que vai rodar mestre e slave inicial. Processos devem ser iniciados manualmente aqui.
         String server_message_start = "appstarted";
         String server_message_stop = "appstoped";
         String autoelastic_message_start = "startapp";
@@ -408,9 +408,9 @@ public class AutoElastic implements Runnable {
         AutoElastic.iphosts = hosts;        
         AutoElastic.logspath = "/tmp/autoelastic/";
         AutoElastic.vmtemplateid = 3;
-        AutoElastic.intervalo = 15 * 1000;
+        AutoElastic.intervalo = 1 * 1000;
         AutoElastic.num_vms = 2;
-        AutoElastic.viewsize = 6;
+        AutoElastic.viewsize = 8;
         AutoElastic.evaluatortype = "full_aging";
         AutoElastic.thresholdtype = "static";
         AutoElastic.image_manager = "kvm";
@@ -424,9 +424,9 @@ public class AutoElastic implements Runnable {
         int initial_hosts = 1;
         int minimum_hosts = 1;
         boolean letsgo = false;
-        String[] apps = {"ex-"};//cargas que serao testadas
-        int[] upperthresholds = {70,90};//thresholds que serao testados
-        int[] lowerthresholds = {30,50};//thresholds que serao testados
+        String[] apps = {"asc"};//cargas que serao testadas
+        int[] upperthresholds = {10};//thresholds que serao testados
+        int[] lowerthresholds = {5};//thresholds que serao testados
         for (String app : apps) {
             for (int uthreshold : upperthresholds){
                 for (int lthreshold : lowerthresholds){
@@ -563,8 +563,8 @@ public class AutoElastic implements Runnable {
             tempo = (int) ((timen - time0)/1000);
             System.out.println("Main: " + cont + " Time: " + tempo + "s");
             grainEvaluator.cycle();
-            ///*LOG*/gera_log(objname,"Main: " + cont + " Time: " + tempo + "s");
-            ///*LOG*/gera_log(objname,"Main: Sincronizando hosts...");
+            /*LOG*/gera_log(objname,"Main: " + cont + " Time: " + tempo + "s");
+            /*LOG*/gera_log(objname,"Main: Sincronizando hosts...");
             times = times + ";" + System.currentTimeMillis(); //T2-AntesDeSincronizar
             cloud_manager.syncData(); //synchronize data of the cloud
             times = times + ";" + System.currentTimeMillis(); //T3-AposSincronizar&AntesDeCalcularThresholds
@@ -572,8 +572,8 @@ public class AutoElastic implements Runnable {
             times = times + ";" + System.currentTimeMillis(); //T4-AposCalcularThresholds
             //*GRA*/graphic1.update(cont, cloud_manager.getUsedCPU(), cloud_manager.getAllocatedCPU(), cloud_manager.getAllocatedCPU() * thresholds.getUpperThreshold(), cloud_manager.getAllocatedCPU() * thresholds.getLowerThreshold());
             //*GRA*/graphic2.update(cont, cloud_manager.getCPULoad(), 1, thresholds.getUpperThreshold(), thresholds.getLowerThreshold());
-            ///*LOG*/gera_log(objname,"Main|monitora: Carga do ambiente: " + cloud_manager.getCPULoad() + " / Threshold superior: " + thresholds.getUpperThreshold() + " / Threshold inferior: " + thresholds.getLowerThreshold());
-            ///*LOG*/gera_log(objname,"Main: Realiza verificação de alguma violação dos thresholds...");
+            /*LOG*/gera_log(objname,"Main|monitora: Carga do ambiente: " + cloud_manager.getCPULoad() + " / Threshold superior: " + thresholds.getUpperThreshold() + " / Threshold inferior: " + thresholds.getLowerThreshold());
+            /*LOG*/gera_log(objname,"Main: Realiza verificação de alguma violação dos thresholds...");
             times = times + ";" + System.currentTimeMillis(); //T5-AntesDeAvaliarCarga
             evaluator.computeLoad(cloud_manager.getCPULoad());
             if (recalculate_thresholds > 0){//se essa flag foi maior que 0 então devo recalcular os thresholds (faço isso após a sincronização)
@@ -599,31 +599,35 @@ public class AutoElastic implements Runnable {
                 /*LOG*/export_log(cont, tempo, System.currentTimeMillis(), cloud_manager.getTotalActiveHosts(), cloud_manager.getAllocatedCPU(), cloud_manager.getUsedCPU(), cloud_manager.getAllocatedMEM(), cloud_manager.getUsedMEM(), cloud_manager.getAllocatedCPU() * thresholds.getUpperThreshold(), cloud_manager.getAllocatedCPU() * thresholds.getLowerThreshold(), cloud_manager.getCPULoad(), evaluator.getDecisionLoad(), thresholds.getLowerThreshold(), thresholds.getUpperThreshold(), cloud_manager.getLastMonitorTimes());
                 //here we need deal with the violation
                 if (evaluator.isHighAction()){//if we have a violation on the high threshold
-                    ///*LOG*/gera_log(objname,"Main: Avaliador detectou alta carga...Verificando se SLA está no limite...");
+                    /*LOG*/gera_log(objname,"Main: Avaliador detectou alta carga...Verificando se SLA está no limite...");
                     evaluator.resetFlags(); //after deal with the problem/violation, re-initialize the parameters of evaluation
                     if(sla.canIncrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can increase resources
-                        ///*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser alocado...");
-                        ///*LOG*/gera_log(objname,"Main: Alocando recursos...");
+                        /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser alocado...");
+                        /*LOG*/gera_log(objname,"Main: Alocando recursos...");
                         times = times + ";" + System.currentTimeMillis(); //T7-AntesDeAlocar
                         
                         int totalVMs = grainEvaluator.getNumberOfVms();
+                        gera_log(objname, "Total de VMS: " + totalVMs);
                         int maxVms = sla.get_metricas()[1] * num_vms;
+                        gera_log(objname, "Máximo de VMS: " + maxVms);
                         if (totalVMs > maxVms) {
                             totalVMs = maxVms;
                         }
+                        gera_log(objname, "Total de VMS: " + totalVMs);
+                        //System.exit(0);
                         cloud_manager.increaseResources(totalVMs); //increase one host and the number of vms informed in the parameters
                         resourcesPending = true;
                         times = times + ";" + System.currentTimeMillis() + ";;"; //T8-AposAlocar + T9 e T10 vazios
                     } else {
                         times = times + ";;;;"; //T7 T8 T9 e T10 vazios
-                        ///*LOG*/gera_log(objname,"Main: SLA no limite...nada pode ser feito...");
+                        /*LOG*/gera_log(objname,"Main: SLA no limite...nada pode ser feito...");
                     }
                 } else if (evaluator.isLowAction()){ //if we have a violation on the low threshold
-                    ///*LOG*/gera_log(objname,"Main: Avaliador detectou baixa carga...Verificando se SLA está no limite...");
+                    /*LOG*/gera_log(objname,"Main: Avaliador detectou baixa carga...Verificando se SLA está no limite...");
                     evaluator.resetFlags(); //after deal with the problem/violation, re-initialize the parameters of evaluation                    
                     if(sla.canDecrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can decrease resources
-                        ///*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser liberado...");
-                        ///*LOG*/gera_log(objname,"Main: Liberando recursos...");
+                        /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser liberado...");
+                        /*LOG*/gera_log(objname,"Main: Liberando recursos...");
                         times = times + ";;;" + System.currentTimeMillis(); //T7 e T8 vazios + T9-AntesDeDesalocar
                         int totalVMs = grainEvaluator.getNumberOfVms();
                         int minVMs = sla.get_metricas()[0] * num_vms;
@@ -636,15 +640,15 @@ public class AutoElastic implements Runnable {
                         times = times + ";" + System.currentTimeMillis(); //T10-AposDesalocar
                     } else {
                         times = times + ";;;;"; //T7 T8 T9 e T10 vazios
-                        ///*LOG*/gera_log(objname,"Main: SLA no limite...nada pode ser feito...");
+                        /*LOG*/gera_log(objname,"Main: SLA no limite...nada pode ser feito...");
                     }
                 } else {
-                        ///*LOG*/gera_log(objname,"Main: Evaluator problem. We have violation but we do not know which.");
+                        /*LOG*/gera_log(objname,"Main: Evaluator problem. We have violation but we do not know which.");
                 }
             } else {
                 times = times + ";" + System.currentTimeMillis() + ";;;;"; //T6-AposAvaliarCarga + T7 T8 T9 e T10 vazios
                 /*LOG*/export_log(cont, tempo, System.currentTimeMillis(), cloud_manager.getTotalActiveHosts(), cloud_manager.getAllocatedCPU(), cloud_manager.getUsedCPU(), cloud_manager.getAllocatedMEM(), cloud_manager.getUsedMEM(), cloud_manager.getAllocatedCPU() * thresholds.getUpperThreshold(), cloud_manager.getAllocatedCPU() * thresholds.getLowerThreshold(), cloud_manager.getCPULoad(), evaluator.getDecisionLoad(), thresholds.getLowerThreshold(), thresholds.getUpperThreshold(), cloud_manager.getLastMonitorTimes());
-                ///*LOG*/gera_log(objname,"Main: Nenhum problema detectado pelo avaliador ou aguardando vms.");
+                /*LOG*/gera_log(objname,"Main: Nenhum problema detectado pelo avaliador ou aguardando vms.");
             }
             times = times + ";" + System.currentTimeMillis(); //T11-AntesVerificarRecursosPendentes
             if (resourcesPending){//se tenho recursos pendentes, entao devo verificar se eles ja estao online para eu adicionalos e recalcular os thresholds

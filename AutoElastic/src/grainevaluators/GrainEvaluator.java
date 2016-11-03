@@ -21,7 +21,7 @@ public class GrainEvaluator {
     private int cont;
     private final double loads[];
     private final int vms[];
-    private static final int LOAD_SIZE=10;
+    private static final int LOAD_SIZE=8;
     
     static Rengine re;
     static REXP resp;
@@ -40,7 +40,10 @@ public class GrainEvaluator {
         thresholds = t;
         
         String args[] = {"--no-save"};
-        re = new Rengine(args, true, null);
+        re = Rengine.getMainEngine();
+        if (re == null) {
+            re = new Rengine(args, true, null);
+        }
     }
     
     public void cycle() {
@@ -52,7 +55,8 @@ public class GrainEvaluator {
     
     public int getNumberOfVms()
     {
-        if (cont > loads.length) {
+        gera_log(objname, "Cont: " + cont + " Length: " + loads.length);
+        if (cont >= loads.length) {
             double futureLoad = getFutureLoad();
             double vmCapacity = getVMCapacity();
             double averageLoad = getAverageLoad();
@@ -72,8 +76,7 @@ public class GrainEvaluator {
             
             
         }
-        //gera_log(objname, "Morrendo...");
-        //System.exit(-1);
+        
         return 1;
     }
     

@@ -11,6 +11,7 @@ package middlewares;
 import static autoelastic.AutoElastic.gera_log;
 import communication.SSHClient;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -174,11 +175,14 @@ public class OneManager {
         
         // desconsidera a quantidade de vms rodando
         quantity -= getTotalActiveVms();
-        
+        gera_log(objname, "Quantidade de vms: " + quantity);
         if (quantity <= 0) { // para garantir que sempre realize uma operação de elasticidade
             quantity = vms_for_host;
         }
+        gera_log(objname, "Quantidade de vms: " + quantity);
+        boolean result = false;
         while (quantity > 0) { 
+            gera_log(objname, "[Laço] Quantidade de vms: " + quantity);
             gera_log(objname, "Increase Resources...");
             int hostid = ohpool.allocatesHost(oneClient, pos); //allocates the host and it will be active after resorces be online
             pos++;
@@ -195,33 +199,43 @@ public class OneManager {
                     quantity--;
                 }
                 waiting_vms = true;
-                return true;
+                result = true;
             } else {
                 break;
             }
         }
-        return false;
+        
+        return result;
     }
     
     //método que remove um host e suas máquinas virtuais no ambiente
     public boolean decreaseResources(int quantity) throws InterruptedException, IOException{
         // obtem somente a quantidade de vms a serem removidas
         quantity = getTotalActiveVms() - quantity;
+        gera_log(objname, "Quantidade de vms: " + quantity);
         
         if (quantity <= 0) { // para garantir que sempre realize uma operação de elasticidade
             quantity = vms_for_host;
         }
+        gera_log(objname, "Quantidade de vms: " + quantity);
+        
         boolean result = false;
-        if (messenger.notifyDecrease()){
-            result = true;
-            while(!messenger.canDecrease()){}
-            while (quantity > 0) {
-                if (!ohpool.remove_host(oneClient)) { //remove último host criado e suas vms também
-                    return false;
-                }
-                quantity -= vms_for_host;
+        while (quantity > 0) {
+            OneHost host = ohpool.getLastHost();
+            ArrayList<OneVM> vms = host.getVms();
+            String message = "";
+            for (int i=0; i < vms.size(); i++) {
+                message += vms.get(i).get_ip() + "\n";
             }
-            
+            if (messenger.notifyDecrease(message)){
+                result = true;
+                while(!messenger.canDecrease()){}
+            }
+            if (!ohpool.remove_host(oneClient)) { //remove último host criado e suas vms também
+                return false;
+            }
+            quantity -= vms_for_host;
+            gera_log(objname, "[laço] Quantidade de vms: " + quantity);
         }
         return result;
     }
@@ -243,34 +257,32 @@ public class OneManager {
     public boolean newResourcesPending() throws ParserConfigurationException, SAXException, IOException, InterruptedException{        
         if (waiting_vms){
             boolean canPing = true;
-            boolean activeLCM = true;
             String message = "";
             
             for (int i=0; i<last_vms.size(); i++) {
                 OneVM vm = last_vms.get(i);
+                vm.sync_vm();
                 gera_log(objname, "IP: " + vm.get_ip());
                 message += vm.get_ip() + "\n";
-                if (vm.get_ip().equalsIgnoreCase("")&&false) {
+                if (vm.get_ip().equalsIgnoreCase("")) {
                     return false;
                 } else {
+                    gera_log(objname,"Can ping? " + ping(vm.get_ip()));
+                
                     if (!ping(vm.get_ip())){
                         canPing = false;
-                    }
-                    
-                    if (vm.get_lcm_state() != 3) {
-                        activeLCM = false;
                     }
                 //System.out.println("STATE: " + last_vms[0].get_state());
                 }
             }
-            
-            if (canPing || activeLCM) {
-                ohpool.enableLastHost();
+            gera_log(objname,"Can ping? " + canPing);
+            if (canPing) {
+                ohpool.enableHosts(last_vms.size()/vms_for_host);
                 waiting_vms = false;
-                if (canPing) {
-                    //gera_log(objname,"Notifica criação de novos recursos...");
-                    messenger.notifyNewResources(message);
-                }
+
+                gera_log(objname,"Notifica criação de novos recursos...");
+                messenger.notifyNewResources(message);
+    
             }
         }
         return waiting_vms;
@@ -278,6 +290,14 @@ public class OneManager {
     
     //ping :)
     private boolean ping(String ip) {
+        boolean online = false;
+        try {
+            InetAddress address = InetAddress.getByName(ip);
+            online = address.isReachable(10000);
+        } catch (Exception e){
+        }
+        return online;
+        /*
         String resposta;
         int fim;
         boolean online = false;
@@ -299,7 +319,7 @@ public class OneManager {
             }
         } catch (Exception e) {
         }
-        return online;
+        return online;*/
     }
     
     public void setSSHClient(SSHClient sshClient) {
