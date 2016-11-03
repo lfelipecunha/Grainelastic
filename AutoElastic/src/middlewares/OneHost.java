@@ -122,6 +122,7 @@ public class OneHost {
     
     public boolean delete_vms(){
         while (!vms.isEmpty()){
+            gera_log(this.name, "Deletando VM: " + vms.get(0).get_id());
             vms.get(0).delete();
             vms.remove(0);
         }

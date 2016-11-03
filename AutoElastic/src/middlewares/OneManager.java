@@ -205,8 +205,8 @@ public class OneManager {
     
     //método que remove um host e suas máquinas virtuais no ambiente
     public boolean decreaseResources(int quantity) throws InterruptedException, IOException{
-        // desconsidera a quantidade de vms rodando
-        quantity -= getTotalActiveVms();
+        // obtem somente a quantidade de vms a serem removidas
+        quantity = getTotalActiveVms() - quantity;
         
         if (quantity <= 0) { // para garantir que sempre realize uma operação de elasticidade
             quantity = vms_for_host;
@@ -250,7 +250,7 @@ public class OneManager {
                 OneVM vm = last_vms.get(i);
                 gera_log(objname, "IP: " + vm.get_ip());
                 message += vm.get_ip() + "\n";
-                if (vm.get_ip().equalsIgnoreCase("")) {
+                if (vm.get_ip().equalsIgnoreCase("")&&false) {
                     return false;
                 } else {
                     if (!ping(vm.get_ip())){

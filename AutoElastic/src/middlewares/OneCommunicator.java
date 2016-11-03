@@ -85,7 +85,8 @@ public class OneCommunicator {
     
     //método para verificar se arquivo de liberação foi criado no diretório no frontend
     public boolean canDecrease() {
-        
+        return true;
+        /*
         boolean libera;
         if (ssh.fileExists(permission_decrease_file_name, remotedir_file_source)){
             ssh.deleteFile(permission_decrease_file_name, remotedir_file_source);
@@ -97,7 +98,7 @@ public class OneCommunicator {
             //gera_log(objname,"Main|VerificaLiberacao: Recursos ainda não podem ser liberados.");
             libera = false;
         }
-        return libera;
+        return libera;*/
     }
 
     //método para enviar que cria e envia arquivo para o frontend, notificando a aplicação da criação de novo host e vm

@@ -67,7 +67,11 @@ public class OneVM {
             System.out.println("Falha ao deletar VM ID " + this.id + "\n" + rc.getErrorMessage());
             return false;
         }
-        this.vm.undeploy(false);
+        rc = this.vm.undeploy(true);
+        if (rc.isError()){
+            System.out.println("Falha ao desvincular a VM ID " + this.id + "\n" + rc.getErrorMessage());
+            return false;
+        }
         return true;
     }
     

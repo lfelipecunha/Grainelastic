@@ -166,7 +166,7 @@ public class AutoElastic implements Runnable {
     public void run() {
         
         //Este é o gerenciador principal
-        System.out.println("Oi Vini");        
+        System.out.println("Oi Luiz");        
 
         try {
 /*LOG*    */gera_log(objname,"Inicialização...");
@@ -267,7 +267,12 @@ public class AutoElastic implements Runnable {
                     if(sla.canIncrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can increase resources
                         /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser alocado...");
                         /*LOG*/gera_log(objname,"Main: Alocando recursos...");
-                        cloud_manager.increaseResources(grainEvaluator.getNumberOfVms()); //increase one host and the number of vms informed in the parameters
+                        int totalVMs = grainEvaluator.getNumberOfVms();
+                        int maxVms = sla.get_metricas()[1] * num_vms;
+                        if (totalVMs > maxVms) {
+                            totalVMs = maxVms;
+                        }
+                        cloud_manager.increaseResources(totalVMs); //increase one host and the number of vms informed in the parameters
                         resourcesPending = true;
                     } else {
                         /*LOG*/gera_log(objname,"Main: SLA no limite...nada pode ser feito...");
@@ -278,7 +283,12 @@ public class AutoElastic implements Runnable {
                     if(sla.canDecrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can decrease resources
                         /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser liberado...");
                         /*LOG*/gera_log(objname,"Main: Liberando recursos...");
-                        cloud_manager.decreaseResources(grainEvaluator.getNumberOfVms()); //decrease the last host added and the number its vms
+                        int totalVMs = grainEvaluator.getNumberOfVms();
+                        int minVMs = sla.get_metricas()[0] * num_vms;
+                        if (totalVMs < minVMs) {
+                            totalVMs = minVMs;
+                        }
+                        cloud_manager.decreaseResources(totalVMs); //decrease the last host added and the number its vms
                         recalculate_thresholds = 2;
                         load_before = evaluator.getDecisionLoad();
                     } else {
@@ -595,7 +605,13 @@ public class AutoElastic implements Runnable {
                         ///*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser alocado...");
                         ///*LOG*/gera_log(objname,"Main: Alocando recursos...");
                         times = times + ";" + System.currentTimeMillis(); //T7-AntesDeAlocar
-                        cloud_manager.increaseResources(grainEvaluator.getNumberOfVms()); //increase one host and the number of vms informed in the parameters
+                        
+                        int totalVMs = grainEvaluator.getNumberOfVms();
+                        int maxVms = sla.get_metricas()[1] * num_vms;
+                        if (totalVMs > maxVms) {
+                            totalVMs = maxVms;
+                        }
+                        cloud_manager.increaseResources(totalVMs); //increase one host and the number of vms informed in the parameters
                         resourcesPending = true;
                         times = times + ";" + System.currentTimeMillis() + ";;"; //T8-AposAlocar + T9 e T10 vazios
                     } else {
@@ -609,7 +625,12 @@ public class AutoElastic implements Runnable {
                         ///*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser liberado...");
                         ///*LOG*/gera_log(objname,"Main: Liberando recursos...");
                         times = times + ";;;" + System.currentTimeMillis(); //T7 e T8 vazios + T9-AntesDeDesalocar
-                        cloud_manager.decreaseResources(grainEvaluator.getNumberOfVms()); //decrease the last host added and the number its vms
+                        int totalVMs = grainEvaluator.getNumberOfVms();
+                        int minVMs = sla.get_metricas()[0] * num_vms;
+                        if (totalVMs < minVMs) {
+                            totalVMs = minVMs;
+                        }
+                        cloud_manager.decreaseResources(totalVMs); //decrease the last host added and the number its vms
                         recalculate_thresholds = 2;
                         load_before = evaluator.getDecisionLoad();
                         times = times + ";" + System.currentTimeMillis(); //T10-AposDesalocar

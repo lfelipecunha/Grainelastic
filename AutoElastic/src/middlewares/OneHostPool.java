@@ -122,7 +122,8 @@ public class OneHostPool {
     public int allocatesHost(Client oc, int position) throws Exception
     {
         if (!hosts_inativos.isEmpty()){
-            if (hosts_inativos.size() <= position+1) {
+            gera_log(objname, "Position: " + position);
+            if (hosts_inativos.size() >= position+1) {
                 OneHost host;
                 host = hosts_inativos.get(position);
                 host.create(oc);
