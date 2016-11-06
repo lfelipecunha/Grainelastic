@@ -48,7 +48,7 @@ public class OneCommunicator {
     private final String permission_decrease_file_name = "liberarecurso.txt";
     private final String warning_deacrease_file_name = "poucacarga.txt";
     private final String notify_increase_file_name = "novorecurso.txt";
-    private final String localdir_temp_files = "C:\\temp\\autoelastic\\";
+    private final String localdir_temp_files = "C:\\Temp\\autoelastic\\";
     private SSHClient ssh;
     
     public OneCommunicator(String pserver, String puser, String ppassword, JTextArea plog){
@@ -110,13 +110,17 @@ public class OneCommunicator {
             //arquivo.mkdirs();
             File arquivo = new File(localdir_temp_files + notify_increase_file_name);
             BufferedWriter escritor = new BufferedWriter(new FileWriter(arquivo));
+            gera_log(objname,"Conteudo do arquivo: " + file_content);
             escritor.write(file_content + "\n");
+            escritor.close();
             //if (envia_arquivo(arquivo.getAbsolutePath())) {
+            gera_log(objname,"Arquivo Local: " + arquivo.getAbsolutePath());
+            gera_log(objname,"Caminho remoto: " + remotedir_file_target);
             if (ssh.sendFile(arquivo.getAbsolutePath(), remotedir_file_target)){
-                //gera_log(objname,"Main|notifica: Arquivo enviado com sucesso...");
+                gera_log(objname,"Main|notifica: Arquivo enviado com sucesso...");
                 return true;
             } else {
-                //gera_log(objname,"Main|notifica: Arquivo não foi enviado...");
+                gera_log(objname,"Main|notifica: Arquivo não foi enviado...");
             }
         } catch (IOException ex) {
             Logger.getLogger(AutoElastic.class.getName()).log(Level.SEVERE, null, ex);

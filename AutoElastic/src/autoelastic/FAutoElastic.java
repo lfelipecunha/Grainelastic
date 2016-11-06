@@ -607,9 +607,8 @@ public class FAutoElastic extends javax.swing.JFrame {
         jtHosts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {"191.4.237.220"},
-                {"191.4.233.173"},
                 {"191.4.238.196"},
-                {"191.4.239.117"}
+                {"191.4.238.197"}
             },
             new String [] {
                 "Hosts"
@@ -1582,8 +1581,8 @@ public class FAutoElastic extends javax.swing.JFrame {
         this.jtfFrontend.setText("191.4.234.53");
         this.jtfUsuario.setText("oneadmin");
         this.jtfSenha.setText("nebula");
-        this.jtfSla.setText("/home/luiz/autoelastic/sla.xml");
-        this.jtfLogPath.setText("/tmp/autoelastic/");
+        this.jtfSla.setText("C:\\Users\\PIPCA\\Documents\\NetBeansProjects\\Grainelastic\\AutoElastic\\sla.xml");
+        this.jtfLogPath.setText("C:\\Temp\\autoelastic\\");
         this.jtfExecutionLogName.setText("");
         this.jtfMonitoringInterval.setText("15");
         this.jtfMonitoringWindow.setText("6");

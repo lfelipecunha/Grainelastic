@@ -39,11 +39,12 @@ public class GrainEvaluator {
         cloudManager = cm;
         thresholds = t;
         
-        String args[] = {"--no-save"};
+        /*String args[] = {"--no-save"};
         re = Rengine.getMainEngine();
         if (re == null) {
             re = new Rengine(args, true, null);
-        }
+        }*/
+        re = new Rengine(null, true, null);
     }
     
     public void cycle() {

@@ -190,8 +190,8 @@ public class SSHClient {
                 long filesize = _lfile.length();
                 command = "C0644 " + filesize + " ";
                 //realiza corte para pegar apenas o nome do arquivo
-                if (filepath.lastIndexOf('/') > 0) {
-                    command += filepath.substring(filepath.lastIndexOf('/') + 1);
+                if (filepath.lastIndexOf('\\') > 0) {
+                    command += filepath.substring(filepath.lastIndexOf('\\') + 1);
                 } else {
                     command += filepath;
                 }
@@ -228,7 +228,7 @@ public class SSHClient {
             //session.disconnect();
         } catch (JSchException | IOException e) {
             //gera_log(objname,e.toString());
-            System.out.println(e.toString());
+            System.out.println("ERROR: " + e.toString());
             try {
                 if (fis != null) {
                     fis.close();

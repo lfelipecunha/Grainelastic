@@ -277,6 +277,7 @@ public class OneManager {
             }
             gera_log(objname,"Can ping? " + canPing);
             if (canPing) {
+                gera_log(objname,"IPS: " + message);
                 ohpool.enableHosts(last_vms.size()/vms_for_host);
                 waiting_vms = false;
 

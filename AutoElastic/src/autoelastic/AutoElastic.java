@@ -386,12 +386,12 @@ public class AutoElastic implements Runnable {
         System.out.println("Pass: " + pwd);
         
         SSHClient ssh = new SSHClient(srv, usr, pwd);
-        String ip_vm_master = "191.4.238.100";//VM que vai rodar mestre e slave inicial. Processos devem ser iniciados manualmente aqui.
+        String ip_vm_master = "191.4.238.154";//VM que vai rodar mestre e slave inicial. Processos devem ser iniciados manualmente aqui.
         String server_message_start = "appstarted";
         String server_message_stop = "appstoped";
         String autoelastic_message_start = "startapp";
         String master_command;
-        String localdir_temp_files = "/tmp/autoelastic/";
+        String localdir_temp_files = "C:\\Temp\\autoelastic\\";
         String remotedir_message = "/var/lib/one/app/msg/";
         String remotedir_logs = "/one/app/logs/"; //diretorio que o mestre irá utilizar para salvar os logs
         
@@ -406,9 +406,9 @@ public class AutoElastic implements Runnable {
         AutoElastic.slapath = sla;
         AutoElastic.log = lg;
         AutoElastic.iphosts = hosts;        
-        AutoElastic.logspath = "/tmp/autoelastic/";
+        AutoElastic.logspath = "C:\\Temp\\autoelastic\\";
         AutoElastic.vmtemplateid = 3;
-        AutoElastic.intervalo = 1 * 1000;
+        AutoElastic.intervalo = 15 * 1000;
         AutoElastic.num_vms = 2;
         AutoElastic.viewsize = 8;
         AutoElastic.evaluatortype = "full_aging";
@@ -515,7 +515,7 @@ public class AutoElastic implements Runnable {
                         }
 
                         //aqui vamos colocar dentro do arquivo de alocações um marcador de que uma nova execução está iniciando. Esse marcador vai ser o nome da execução que é o nome do outro log que é gerado
-                        arquivo = new File("/tmp/autoelastic/autoelastic_resource_operation.csv");
+                        arquivo = new File("C:\\Temp\\autoelastic\\autoelastic_resource_operation.csv");
                         escritor = new BufferedWriter(new FileWriter(arquivo, true));
                         escritor.append(System.currentTimeMillis() + ";INI " + AutoElastic.logtitle + "\n");
                         escritor.close();
@@ -525,7 +525,7 @@ public class AutoElastic implements Runnable {
                         System.out.println("###############Aplicação finalizada###############");
 
                         //aqui vamos escrever dentro do arquivo de alocações que a execução terminou
-                        arquivo = new File("/tmp/autoelastic/autoelastic_resource_operation.csv");
+                        arquivo = new File("C:\\Temp\\autoelastic\\autoelastic_resource_operation.csv");
                         escritor = new BufferedWriter(new FileWriter(arquivo, true));
                         escritor.append(System.currentTimeMillis() + ";FIM " + AutoElastic.logtitle + "\n");
                         escritor.close();
@@ -534,7 +534,7 @@ public class AutoElastic implements Runnable {
                         ssh.deleteFile(server_message_start, remotedir_message);
 
                         //vamos salvar o log com os tempos do AutoElastic
-                        arquivo = new File("/tmp/autoelastic/Tempos-" + AutoElastic.logtitle + ".csv");
+                        arquivo = new File("C:\\Temp\\autoelastic\\Tempos-" + AutoElastic.logtitle + ".csv");
                         escritor = new BufferedWriter(new FileWriter(arquivo, true));
                         escritor.append(times);
                         escritor.close();
@@ -593,12 +593,12 @@ public class AutoElastic implements Runnable {
                 }
                 recalculate_thresholds = 0;
             }
-            if ((evaluator.evaluate(thresholds.getUpperThreshold(), thresholds.getLowerThreshold())) && (!resourcesPending)){
+            if ((evaluator.evaluate(thresholds.getUpperThreshold(), thresholds.getLowerThreshold())) && (!resourcesPending) || cont == 1){
                 //analyze the cloud situation and if we have some violation we need deal with this and if we are not waiting for new resource allocation we can evaluate the cloud
                 times = times + ";" + System.currentTimeMillis(); //T6-AposAvaliarCarga
                 /*LOG*/export_log(cont, tempo, System.currentTimeMillis(), cloud_manager.getTotalActiveHosts(), cloud_manager.getAllocatedCPU(), cloud_manager.getUsedCPU(), cloud_manager.getAllocatedMEM(), cloud_manager.getUsedMEM(), cloud_manager.getAllocatedCPU() * thresholds.getUpperThreshold(), cloud_manager.getAllocatedCPU() * thresholds.getLowerThreshold(), cloud_manager.getCPULoad(), evaluator.getDecisionLoad(), thresholds.getLowerThreshold(), thresholds.getUpperThreshold(), cloud_manager.getLastMonitorTimes());
                 //here we need deal with the violation
-                if (evaluator.isHighAction()){//if we have a violation on the high threshold
+                if (evaluator.isHighAction() || cont == 1){//if we have a violation on the high threshold
                     /*LOG*/gera_log(objname,"Main: Avaliador detectou alta carga...Verificando se SLA está no limite...");
                     evaluator.resetFlags(); //after deal with the problem/violation, re-initialize the parameters of evaluation
                     if(sla.canIncrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can increase resources
