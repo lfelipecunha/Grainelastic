@@ -1207,6 +1207,7 @@ public class FAutoElastic extends javax.swing.JFrame {
                     //if we selected the lab mode the parameters to be used will be others
                     this.setVisible(false);
                     autoelastic_manager.startLabMode(this.jtfFrontend.getText(), this.jtfUsuario.getText(), this.jtfSenha.getText(), this.jtfSla.getText(), hosts, jtaLog);
+                    exit();
                 } catch (IOException ex) {
                     Logger.getLogger(FAutoElastic.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (ParserConfigurationException ex) {
@@ -1464,7 +1465,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -1570,13 +1571,13 @@ public class FAutoElastic extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void centraliza_tela() {
-        // Centraliza a janela de abertura no centro do desktop.  
+        // Centraliza a janela de abertura no centro do desktop.
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         Rectangle r = this.getBounds();
-        // Dimensões da janela  
+        // Dimensões da janela
         int widthSplash = r.width;
         int heightSplash = r.height;
-        // calculo para encontrar as cooredenadas X e Y para a centralização da janela.  
+        // calculo para encontrar as cooredenadas X e Y para a centralização da janela.
         int posX = (screen.width / 2) - (widthSplash / 2);
         int posY = (screen.height / 2) - (heightSplash / 2);
         this.setBounds(posX, posY, widthSplash, heightSplash);
@@ -1600,6 +1601,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         this.jtfVMM.setText("kvm");
         this.jtfVNM.setText("dummy");
         this.jtfClusterId.setText("0");
+        this.jtfInitialNodes.setText("1");
         this.jtaLog.setText("");
     }
 
@@ -1667,7 +1669,7 @@ public class FAutoElastic extends javax.swing.JFrame {
         autoelastic_manager = new AutoElastic(this.jpGraficoLineTotal, this.jbGraphicLinePercent);
         about = new About();
         about.setVisible(false);
-        this.setExtendedState(MAXIMIZED_BOTH);//maximoza janela        
+        this.setExtendedState(MAXIMIZED_BOTH);//maximoza janela
         variaveis_padroes();//inicializo todos os parâmetros para o padrão
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/images/icone64x64.png")).getImage());
     }

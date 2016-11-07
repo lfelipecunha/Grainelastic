@@ -5,11 +5,10 @@
         <group>
             <file>file:/home/luiz/NetBeansProjects/AutoElastic/src/middlewares/OneCommunicator.java</file>
             <file>file:/home/luiz/NetBeansProjects/AutoElastic/src/middlewares/OneManager.java</file>
-            <file>file:/home/luiz/NetBeansProjects/AutoElastic/src/middlewares/OneHost.java</file>
             <file>file:/home/luiz/NetBeansProjects/AutoElastic/src/middlewares/OneVM.java</file>
             <file>file:/home/luiz/NetBeansProjects/AutoElastic/src/grainevaluators/GrainEvaluator.java</file>
             <file>file:/home/luiz/NetBeansProjects/AutoElastic/src/autoelastic/AutoElastic.java</file>
-            <file>file:/home/luiz/NetBeansProjects/AutoElastic/src/slas/WSAgreementSLA.java</file>
+            <file>file:/home/luiz/NetBeansProjects/AutoElastic/src/autoelastic/FAutoElastic.java</file>
             <file>file:/home/luiz/NetBeansProjects/AutoElastic/src/middlewares/OneHostPool.java</file>
         </group>
     </open-files>
