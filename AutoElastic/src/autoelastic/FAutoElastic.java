@@ -606,9 +606,15 @@ public class FAutoElastic extends javax.swing.JFrame {
         jtHosts.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jtHosts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"191.4.237.220"},
+                {"191.4.238.197"},
+                {"191.4.233.61"},
+                {"191.4.239.77"},
                 {"191.4.238.196"},
-                {"191.4.238.197"}
+                {"191.4.239.88"},
+                {"191.4.237.220"},
+                {"191.4.233.173"},
+                {"191.4.239.99"},
+                {"191.4.237.221"}
             },
             new String [] {
                 "Hosts"

@@ -258,7 +258,7 @@ public class OneManager {
         if (waiting_vms){
             boolean canPing = true;
             String message = "";
-            
+
             for (int i=0; i<last_vms.size(); i++) {
                 OneVM vm = last_vms.get(i);
                 vm.sync_vm();

@@ -21,11 +21,11 @@ public class GrainEvaluator {
     private int cont;
     private final double loads[];
     private final int vms[];
-    private static final int LOAD_SIZE=8;
+    private static final int LOAD_SIZE=15;
     
     static Rengine re;
     static REXP resp;
-    static int forecast = 8;
+    static int forecast = 20;
     
     private final OneManager cloudManager;
     private final Thresholds thresholds;

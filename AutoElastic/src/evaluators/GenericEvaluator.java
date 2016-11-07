@@ -31,7 +31,7 @@ public class GenericEvaluator implements Evaluator{
     //public GenericEvaluator(int viewsize, float th_max, float th_min){
         //threshold_high = th_max;
         //threshold_low = th_min;
-    public GenericEvaluator(int viewsize){        
+    public GenericEvaluator(int viewsize){  
         counter = 0; 
         high_alert = false;
         low_alert = false;
