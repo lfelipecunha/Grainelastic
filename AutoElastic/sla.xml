@@ -2,6 +2,6 @@
     <Name>AutoElasticSLA</Name>
     <Terms>
         <MinimalHosts>1</MinimalHosts>
-        <MaximalHosts>9</MaximalHosts>
+        <MaximalHosts>5</MaximalHosts>
     </Terms>
 </Agreement>

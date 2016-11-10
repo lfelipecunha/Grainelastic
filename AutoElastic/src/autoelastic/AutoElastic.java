@@ -212,11 +212,18 @@ public class AutoElastic implements Runnable {
         File arquivo = new File(logspath + "autoelastic" + logtitle + ".csv");
         try (
             BufferedWriter escritor = new BufferedWriter(new FileWriter(arquivo, true))) {
-            escritor.append(contador + ";" + time + ";" + timemilis + ";" + num_hosts + ";" + tot_cpu_dis + ";" + tot_cpu_usa + ";" + tot_mem_dis + ";" + tot_mem_usa + ";" + th_max + ";" + th_min + ";" + load + ";" + calcutated_load + ";" + lowert + ";" + uppert + ";" + extra_info + "\n");
+            String info = contador + ";" + time + ";" + timemilis + ";" + num_hosts + ";" + tot_cpu_dis + ";" + tot_cpu_usa + ";" + tot_mem_dis + ";" + tot_mem_usa + ";" + th_max + ";" + th_min + ";" + load + ";" + calcutated_load + ";" + lowert + ";" + uppert + ";" + extra_info + "\n";
+            info = info.replace('.', ',');
+            escritor.append(info);
             escritor.close();
         } catch (IOException ex) {
             Logger.getLogger(AutoElastic.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private String formatFloatString(float number)
+    {
+        return "";
     }
 
     private void monitoring() throws ParserConfigurationException, SAXException, IOException, InterruptedException, Exception {
@@ -267,7 +274,7 @@ public class AutoElastic implements Runnable {
                     if(sla.canIncrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can increase resources
                         /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser alocado...");
                         /*LOG*/gera_log(objname,"Main: Alocando recursos...");
-                        int totalVMs = grainEvaluator.getNumberOfVms();
+                        int totalVMs = grainEvaluator.getNumberOfVms(true);
                         int maxVms = sla.get_metricas()[1] * num_vms;
                         if (totalVMs > maxVms) {
                             totalVMs = maxVms;
@@ -283,7 +290,7 @@ public class AutoElastic implements Runnable {
                     if(sla.canDecrease(cloud_manager.getTotalActiveHosts())){ //verify the SLA to know if we can decrease resources
                         /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser liberado...");
                         /*LOG*/gera_log(objname,"Main: Liberando recursos...");
-                        int totalVMs = grainEvaluator.getNumberOfVms();
+                        int totalVMs = grainEvaluator.getNumberOfVms(false);
                         int minVMs = sla.get_metricas()[0] * num_vms;
                         if (totalVMs < minVMs) {
                             totalVMs = minVMs;
@@ -387,7 +394,7 @@ public class AutoElastic implements Runnable {
         System.out.println("Pass: " + pwd);
 
         SSHClient ssh = new SSHClient(srv, usr, pwd);
-        String ip_vm_master = "191.4.238.154";//VM que vai rodar mestre e slave inicial. Processos devem ser iniciados manualmente aqui.
+        String ip_vm_master = "191.4.238.102";//VM que vai rodar mestre e slave inicial. Processos devem ser iniciados manualmente aqui.
         String server_message_start = "appstarted";
         String server_message_stop = "appstoped";
         String autoelastic_message_start = "startapp";
@@ -425,7 +432,7 @@ public class AutoElastic implements Runnable {
         int initial_hosts = 1;
         int minimum_hosts = 1;
         boolean letsgo = false;
-        String[] apps = {"asc"};//cargas que serao testadas
+        String[] apps = {"ex+"};//cargas que serao testadas
         int[] upperthresholds = {70};//thresholds que serao testados
         int[] lowerthresholds = {30};//thresholds que serao testados
         for (String app : apps) {
@@ -607,7 +614,7 @@ public class AutoElastic implements Runnable {
                         /*LOG*/gera_log(objname,"Main: Alocando recursos...");
                         times = times + ";" + System.currentTimeMillis(); //T7-AntesDeAlocar
 
-                        int totalVMs = grainEvaluator.getNumberOfVms();
+                        int totalVMs = grainEvaluator.getNumberOfVms(true);
                         gera_log(objname, "Total de VMS: " + totalVMs);
                         int maxVms = sla.get_metricas()[1] * num_vms;
                         gera_log(objname, "Máximo de VMS: " + maxVms);
@@ -630,7 +637,7 @@ public class AutoElastic implements Runnable {
                         /*LOG*/gera_log(objname,"Main: SLA não atingido...novo recurso pode ser liberado...");
                         /*LOG*/gera_log(objname,"Main: Liberando recursos...");
                         times = times + ";;;" + System.currentTimeMillis(); //T7 e T8 vazios + T9-AntesDeDesalocar
-                        int totalVMs = grainEvaluator.getNumberOfVms();
+                        int totalVMs = grainEvaluator.getNumberOfVms(false);
                         int minVMs = sla.get_metricas()[0] * num_vms;
                         if (totalVMs < minVMs) {
                             totalVMs = minVMs;

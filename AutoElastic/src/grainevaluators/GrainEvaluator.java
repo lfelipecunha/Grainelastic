@@ -19,8 +19,7 @@ import java.util.ArrayList;
 public class GrainEvaluator {
 
     private static final String objname = "grainevaluators.GrainEvaluator";
-    private final ArrayList<double> loads;
-    private static final int LOAD_SIZE=15;
+    private ArrayList<Double> loads;
 
     static Rengine re;
     static REXP resp;
@@ -32,7 +31,7 @@ public class GrainEvaluator {
 
     public GrainEvaluator(OneManager cm, Thresholds t)
     {
-        loads = new ArrayList<double>();
+        loads = new ArrayList<>();
         cloudManager = cm;
         thresholds = t;
 
@@ -45,19 +44,19 @@ public class GrainEvaluator {
     }
 
     public void cycle() {
-        saveLoad(cloudManager.getCPULoad(), cloudManager.getTotalActiveVms());
+        saveLoad(cloudManager.getCPULoad());
     }
 
 
 
-    public int getNumberOfVms()
+    public int getNumberOfVms(boolean up)
     {
         gera_log(objname, "Loads Size: " + loads.size());
         double futureLoad = getFutureLoad();
         double vmCapacity = getVMCapacity();
         double averageLoad = getAverageLoad();
 
-        float expectedLoad = getExpectedLoad();
+        double expectedLoad = getExpectedLoad(up);
 
         gera_log(objname, "Future Load: " + futureLoad);
         gera_log(objname, "VM Capacity: " + vmCapacity);
@@ -81,7 +80,7 @@ public class GrainEvaluator {
         for (int i=0; i< loads.size(); i++) {
             sum += loads.get(i);
         }
-        return sum / loads.get(i);
+        return sum / loads.size();
     }
 
     private double getFutureLoad()
@@ -90,8 +89,12 @@ public class GrainEvaluator {
         int lastMultiplier = 0;
         int sum = 0;
         float result = 0;
-
-        re.assign("y", loads);
+        double list[] = new double[loads.size()];
+        for  (int i=0; i < loads.size(); i++) {
+            System.out.println("LOAD[" + i + "] = " + loads.get(i));
+            list[i] = (double)loads.get(i);
+        }
+        re.assign("y", list);
         re.eval("fit=arima(y, c(0,2,1))");
         resp = re.eval("f <- predict(fit, " + forecast + ")");
         float decision_load = (float) resp.asList().at(0).asDoubleArray()[forecast - 1];
@@ -100,18 +103,26 @@ public class GrainEvaluator {
         return decision_load;
     }
 
-    private float getExpectedLoad()
+    private double getExpectedLoad(boolean up)
     {
-        return (thresholds.getUpperThreshold() + thresholds.getLowerThreshold()) / 2;
+        double result = (thresholds.getUpperThreshold() + thresholds.getLowerThreshold()) / 2;
+        if (up) {
+            result = result * 0.6;
+        } else {
+            result = result * 1.4;
+        }
+        return result;
     }
 
-    private void saveLoad(float load, int num_vms)
+    private void saveLoad(float load)
     {
-        loads.add(load);
+        if (!Double.isNaN(load)) {
+            loads.add((double)load);
+        }
     }
 
-    private void reset()
+    public void reset()
     {
-        loads = new ArrayList<double>();
+        loads.clear();
     }
 }

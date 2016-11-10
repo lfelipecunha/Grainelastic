@@ -59,15 +59,20 @@ public class OneVM {
         return this.id;
     }
     
-    public boolean delete(){
+    public boolean delete() throws ParserConfigurationException, SAXException, IOException{
         //this.vm.finalizeVM();
         //this.vm.cancel();
-        OneResponse rc = this.vm.poweroff();
-         if (rc.isError()){
-            System.out.println("Falha ao deletar VM ID " + this.id + "\n" + rc.getErrorMessage());
-            return false;
+        sync_vm();
+        System.err.println("LCM: " + this.vm.status() + " - " + this.vm.lcmStateStr());
+        OneResponse rc;
+        if (!this.vm.status().equals("shut")) {
+            rc = this.vm.poweroff();
+             if (rc.isError()){
+                System.out.println("Falha ao deletar VM ID " + this.id + "\n" + rc.getErrorMessage());
+                return false;
+            }
         }
-        rc = this.vm.undeploy(false);
+        rc = this.vm.delete();
         if (rc.isError()){
             System.out.println("Falha ao desvincular a VM ID " + this.id + "\n" + rc.getErrorMessage());
             return false;
