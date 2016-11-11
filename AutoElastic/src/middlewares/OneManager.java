@@ -267,9 +267,10 @@ public class OneManager {
                 if (vm.get_ip().equalsIgnoreCase("")) {
                     return false;
                 } else {
-                    gera_log(objname,"Can ping? " + ping(vm.get_ip()));
+                    boolean canPingVm = ping(vm.get_ip());
+                    gera_log(objname,"Can ping? " + canPingVm);
                 
-                    if (!ping(vm.get_ip())){
+                    if (!canPingVm){
                         canPing = false;
                     }
                 //System.out.println("STATE: " + last_vms[0].get_state());

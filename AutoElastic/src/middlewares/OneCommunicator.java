@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTextArea;
@@ -99,6 +100,16 @@ public class OneCommunicator {
             libera = false;
         }
         return libera;*/
+    }
+    
+    public boolean notifyNewResources(ArrayList<String> ips) throws ParserConfigurationException, SAXException, IOException, InterruptedException {
+        boolean result = true;
+        for (int i = 0; i < ips.size(); i++) {
+            gera_log(objname, "Notificando a incluso de " + ips.get(i));
+            result &= notifyNewResources(ips.get(i));
+            while(ssh.fileExists(remotedir_file_target, notify_increase_file_name));
+       }
+       return result;
     }
 
     //método para enviar que cria e envia arquivo para o frontend, notificando a aplicação da criação de novo host e vm

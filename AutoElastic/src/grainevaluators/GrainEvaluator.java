@@ -51,6 +51,7 @@ public class GrainEvaluator {
 
     public int getNumberOfVms(boolean up)
     {
+        
         gera_log(objname, "Loads Size: " + loads.size());
         double futureLoad = getFutureLoad();
         double vmCapacity = getVMCapacity();
@@ -83,12 +84,8 @@ public class GrainEvaluator {
         return sum / loads.size();
     }
 
-    private double getFutureLoad()
+    public double getFutureLoad()
     {
-        int curMultiplier = 1;
-        int lastMultiplier = 0;
-        int sum = 0;
-        float result = 0;
         double list[] = new double[loads.size()];
         for  (int i=0; i < loads.size(); i++) {
             System.out.println("LOAD[" + i + "] = " + loads.get(i));
