@@ -418,7 +418,7 @@ public class AutoElastic implements Runnable {
         AutoElastic.vmtemplateid = 3;
         AutoElastic.intervalo = 15 * 1000;
         AutoElastic.num_vms = 2;
-        AutoElastic.viewsize = 6;
+        AutoElastic.viewsize = 10;
         AutoElastic.evaluatortype = "generic";
         AutoElastic.thresholdtype = "static";
         AutoElastic.image_manager = "kvm";
@@ -429,10 +429,11 @@ public class AutoElastic implements Runnable {
         inicialize();
         cloud_manager.setSSHClient(ssh);
         //int initial_hosts = 2;
-        int initial_hosts = 1;
-        int minimum_hosts = 1;
+        int initial_hosts = 2;
+        int minimum_hosts = 2;
         boolean letsgo = false;
-        String[] apps = {"con"};//cargas que serao testadas
+        //String[] apps = {"asc","con","wav"};//cargas que serao testadas
+        String[] apps = {"asc"};//cargas que serao testadas
         int[] upperthresholds = {70};//thresholds que serao testados
         int[] lowerthresholds = {30};//thresholds que serao testados
         for (String app : apps) {
@@ -570,7 +571,9 @@ public class AutoElastic implements Runnable {
             times = times + "\n" + cont + ";" + timen; //T1-InicioLoop
             tempo = (int) ((timen - time0)/1000);
             System.out.println("Main: " + cont + " Time: " + tempo + "s");
-            grainEvaluator.cycle();
+            if (!resourcesPending) {
+                grainEvaluator.cycle();
+            }
             /*LOG*/gera_log(objname,"Main: " + cont + " Time: " + tempo + "s");
             /*LOG*/gera_log(objname,"Main: Sincronizando hosts...");
             times = times + ";" + System.currentTimeMillis(); //T2-AntesDeSincronizar
@@ -665,6 +668,7 @@ public class AutoElastic implements Runnable {
                 if (!resourcesPending){//se agora eles não estão mais pendentes é porque ficaram online, tenho que recalcular os thresholds no início da próxima observação
                     recalculate_thresholds = 1;
                     grainEvaluator.reset();
+                    evaluator.reset();
                 }
             }
             times = times + ";" + System.currentTimeMillis(); //T12-AposVerificarRecursosPendentes&FimLoop

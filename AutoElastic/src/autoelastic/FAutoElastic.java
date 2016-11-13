@@ -613,7 +613,8 @@ public class FAutoElastic extends javax.swing.JFrame {
                 {"191.4.237.205"},
                 {"191.4.237.202"},
                 {"191.4.237.203"},
-                {"191.4.233.173"}
+                {"191.4.233.173"},
+                {"191.4.237.221"}
             },
             new String [] {
                 "Hosts"

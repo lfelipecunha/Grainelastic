@@ -120,7 +120,7 @@ public class OneHost {
         this.vms.add(0, onevm);
     }
     
-    public boolean delete_vms(){
+    public boolean delete_vms() throws ParserConfigurationException, SAXException, IOException {
         while (!vms.isEmpty()){
             gera_log(this.name, "Deletando VM: " + vms.get(0).get_id());
             vms.get(0).delete();
